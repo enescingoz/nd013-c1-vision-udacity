@@ -148,7 +148,29 @@ This section should contain a brief description of the steps to follow to run th
 
 ### Dataset
 #### Dataset analysis
-This section should contain a quantitative and qualitative description of the dataset. It should include images, charts and other visualizations.
+The dataset consists of images that recorded in different weather condititons, day time and night time. Every image has 3 different classes:
+
+```
+- Vehicles (Red bounding boxes)
+- Pedestrians (Green bounding boxes)
+- Cyclists (Blue bounding boxes)
+```
+
+4 images visualized below from dataset as an example.
+![dataset_analysis](./images/dataset_analysis/dataset_analysis.png)
+
+
+With "Exploratory Data Analysis.ipynb", dataset distribution calculated and visualized. As seen on the charts, dataset is not distributed equally. Vehicles are creating a large percentage of the dataset. On the other hand, cyclist are seen too rare on images.
+
+On the second chart, average class counts calculated for per image. From chart each image has on average:
+```
+- 17 vehicle
+- 5 pedestrian
+- 1 cyclist
+```
+Please note that, those charts are created from 100.000 data from the dataset. When these metrics calculated for all dataset, values might change.
+![dataset_analysis](./images/dataset_analysis/dataset_distribution.png)
+
 #### Cross validation
 This section should detail the cross validation strategy and justify your approach.
 
