@@ -141,10 +141,32 @@ python inference_video.py --labelmap_path label_map.pbtxt --model_path experimen
 ## Submission Template
 
 ### Project overview
-This section should contain a brief description of the project and what we are trying to achieve. Why is object detection such an important component of self driving car systems?
+This project is the first project of Udacity Self-Driving Car Engineer Nanodegree course. 
+
+In this project, students will create a convolutional neural network to detect and classify objects using data from the Waymo Open Dataset. Students are provided a dataset containing images of urban environments with annotated cyclists, pedestrians and vehicles. First, they will perform an extensive data analysis, including the computation of label distributions, displaying sample images and checking for object occlusions. This analysis will inform students to decide what augmentations are meaningful for the project. Next, they will train a neural network to detect and classify objects. Then, students will monitor the training with TensorBoard and decide when to end it. Finally, they will experiment with different hyperparameters to improve performance.
+
+Object detection is one of the most critical parts of autonomous driving cars such as localization and planning. Object detection is using to detect environment objects such as vehicles or pedestrians for safety reasons, planning new route etc.
 
 ### Set up
-This section should contain a brief description of the steps to follow to run the code for this repository.
+#### Requirements
+* NVIDIA GPU with the latest driver installed
+* docker / nvidia-docker
+
+#### Build
+Build the image with:
+```
+docker build -t project-dev -f Dockerfile .
+```
+
+Create a container with:
+```
+docker run --gpus all -v <PATH TO LOCAL PROJECT FOLDER>:/app/project/ --network=host -ti project-dev bash
+```
+
+Once in container, you will need to auth using:
+```
+gcloud auth login
+```
 
 ### Dataset
 #### Dataset analysis
@@ -171,12 +193,69 @@ On the second chart, average class counts calculated for per image. From chart e
 Please note that, those charts are created from 100.000 data from the dataset. When these metrics calculated for all dataset, values might change.
 ![dataset_analysis](./images/dataset_analysis/dataset_distribution.png)
 
-#### Cross validation
-This section should detail the cross validation strategy and justify your approach.
 
 ### Training
 #### Reference experiment
-This section should detail the results of the reference experiment. It should includes training metrics and a detailed explanation of the algorithm's performances.
+SSD Resnet50 640x640 model trained with batch size 2 for 2500 step. To check model config data for detailed information, please check `experiments/reference/pipeline_new.config`.
+
+`Learning rate` is a configurable parameter that used on training section of a model. Learning rate tell us how quickly our model adapting new conditions. If learning rate is too high, it might cause model to react too quickly, without learn robustly. If it is too low, training process can stuck after a while. As seen on the charts, learning rate dropped 0 after 2500 epoch. If we want to run training process for more epoch, we should increase learning rate and tune it to get more robust results.
+
+`Classification loss` describes how our model detects classes on images. As seen on the chart, classification loss is decreasing as time goes by and out model getting more robust to classify objects.
+
+`Localization loss` is detecting bounding boxes for detected classes. As seen on the chart, localization loss decreasing and creating bounding boxes more precisely.
+
+![training_results](./images/training.png)
 
 #### Improve on the reference
-This section should highlight the different strategies you adopted to improve your model. It should contain relevant figures and details of your findings.
+To improve trained model, new config files created on `experiments` folder. There are 2 new experiment for this dataset:
+```
+- experiment0
+- experiment1
+```
+which is located on `experiments` folder.
+
+During this experiments, [`Tf Object Detection API`](https://github.com/tensorflow/models/blob/master/research/object_detection/protos/preprocessor.proto)  used to add new augmentation options to model config file. Please check the link for detailed informations.
+
+
+### Why dataset augmentation methods used?
+Dataset augmentation is using to improve model performance and train a model that able to cope with different situations. Also, while creating a dataset, it is really hard to record images on hard and different conditions, label them and add to dataset. Rather than adding these images manually, dataset augmentation methods automatically creating different situations on images and expand the dataset with new created images.
+
+
+
+#### experiment0
+In this experiment, `random_rgb_to_gray` augmentation option is added addition to `random_crop_image` (default). For this augmentation option, %80 probability parameter used to choose random images from dataset and convert it to grayscale image.
+
+![experiment0_training](./images/experiment0/training.png)
+
+![experiment0_augmentation](./images/experiment0/augmentations.png)
+
+#### experiment1
+For second experiment, these augmentation options used with given parameters:
+
+- random_horizontal_flip
+
+- random_distort_color
+```
+color_ordering: 1
+```
+
+- random_black_patches
+```
+max_black_patches: 20
+probability: 0.8
+size_to_image_ratio: 0.12
+```
+
+- random_crop_image 
+```
+min_object_covered: 0.0
+min_aspect_ratio: 0.75
+max_aspect_ratio: 3.0
+min_area: 0.75
+max_area: 1.0
+overlap_thresh: 0.0
+```
+
+![experiment1_training](./images/experiment1/training.png)
+
+![experiment1_augmentation](./images/experiment1/augmentations.png)
