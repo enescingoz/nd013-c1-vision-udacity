@@ -204,6 +204,8 @@ SSD Resnet50 640x640 model trained with batch size 2 for 2500 step. To check mod
 
 `Localization loss` is detecting bounding boxes for detected classes. As seen on the chart, localization loss decreasing and creating bounding boxes more precisely.
 
+As seen on the charts, `total_loss` is decreasing that means model converging and learning. Also, losses has not reached a plateau and we should train the model for more iterations. Addition to this, classification loss is bigger than localization loss and this probably meaning that reference model starting to overfitting.
+
 ![training_results](./images/training.png)
 
 #### Improve on the reference
